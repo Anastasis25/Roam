@@ -6,50 +6,49 @@
 <title>Roam · Luxe Sailing</title>
 <style>
   :root{
-    --navy:#15244e; --navy2:#0d1838; --ink:#0a1230; --gold:#c4a875; --gold-deep:#a98a52;
-    --ivory:#f4f1ea; --ivory-dim:#aab2cc; --line:rgba(196,168,117,.24);
-    --sea1:#22386f; --sea2:#0b1430; --land:#d8c8a2; --coast:#9a824f; --route:#c4a875; --ivory-v:#f4f1ea;
+    --navy:#15244e;--navy2:#0d1838;--ink:#0a1230;--gold:#c4a875;--gold-deep:#a98a52;
+    --ivory:#f4f1ea;--ivory-dim:#aab2cc;--line:rgba(196,168,117,.24);
+    --sea1:#22386f;--sea2:#0b1430;--land:#d8c8a2;--coast:#9a824f;--route:#c4a875;--ivory-v:#f4f1ea;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{font-family:'Helvetica Neue',Arial,sans-serif;color:var(--ivory);background:var(--ink);overflow:hidden}
   .serif{font-family:Georgia,'Times New Roman',serif}
   #app{display:flex;height:100vh;width:100vw}
-
   #mapwrap{flex:1;position:relative;background:var(--ink);overflow:hidden}
   #map{width:100%;height:100%;display:block}
   .lbl{font-family:Georgia,serif;font-size:13px;fill:var(--ivory);paint-order:stroke;stroke:rgba(6,12,28,.92);stroke-width:3.5px}
   .region{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:.32em;fill:var(--coast);opacity:.9;text-transform:uppercase}
   .sea{font-family:Georgia,serif;font-style:italic;font-size:14px;letter-spacing:.2em;fill:var(--route);opacity:.34}
   #here{position:absolute;left:13px;bottom:13px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--ivory-dim);background:rgba(10,18,48,.62);padding:6px 11px;border:1px solid var(--line);border-radius:8px;opacity:0;transition:.4s;max-width:70%}
+    color:var(--ivory-dim);background:rgba(10,18,48,.62);padding:6px 11px;border:1px solid var(--line);border-radius:8px;opacity:0;transition:.4s;max-width:72%}
   #here.show{opacity:1}
 
   #panel{width:330px;background:linear-gradient(180deg,var(--navy),var(--navy2));border-left:1px solid var(--line);display:flex;flex-direction:column;height:100vh}
-  .brand{padding:15px 20px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end}
-  .brand .kicker{font-size:9.5px;letter-spacing:.36em;color:var(--gold);text-transform:uppercase}
-  .brand h1{font-family:Georgia,serif;font-size:27px;line-height:1;margin-top:3px}
-  .brand .vessel{font-size:11px;color:var(--ivory-dim);text-align:right;letter-spacing:.06em;line-height:1.4}
 
-  #live{padding:11px 20px;border-bottom:1px solid var(--line);background:rgba(196,168,117,.05)}
-  #live .r1{display:flex;justify-content:space-between;align-items:baseline}
-  #live .leg{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
-  #live .dist{font-family:Georgia,serif;font-size:14px;color:var(--ivory)}
+  /* consolidated tour header */
+  .tourhead{padding:13px 20px 12px;border-bottom:1px solid var(--line)}
+  .th-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+  .brandk{font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold)}
+  .brandk i{opacity:.5;font-style:normal;margin:0 3px}
+  .syn{font-size:9px;letter-spacing:.12em;color:#7fd6a0;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+  .syn::before{content:'';width:6px;height:6px;border-radius:50%;background:#7fd6a0;box-shadow:0 0 8px #7fd6a0}
+  .syn.hide{display:none}
+  .th-title{font-family:Georgia,serif;font-size:25px;line-height:1.05}
+  .th-meta{font-size:11.5px;color:var(--ivory-dim);letter-spacing:.02em;margin-top:4px}
+
+  /* slim status strip */
+  #live{padding:9px 20px;border-bottom:1px solid var(--line);background:rgba(196,168,117,.05)}
+  #live .r1{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  #live .name{font-family:Georgia,serif;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #live .dist{font-family:Georgia,serif;font-size:14px;color:var(--ivory);white-space:nowrap}
   #live .dist b{color:var(--gold);font-weight:600}
-  #live .name{font-family:Georgia,serif;font-size:19px;margin-top:0}
-  #bar{height:3px;background:var(--line);border-radius:3px;margin-top:9px;overflow:hidden}
+  #bar{height:3px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}
   #barfill{height:100%;width:0;background:linear-gradient(90deg,var(--gold-deep),var(--gold));transition:width .14s linear}
 
   .scroll{flex:1;overflow-y:auto;padding:12px 18px}
   .scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
-  #booking{margin-bottom:12px;border:1px solid var(--line);border-radius:10px;background:rgba(196,168,117,.06);padding:10px 13px}
-  #booking .top{display:flex;justify-content:space-between;align-items:center}
-  #booking .ref{font-size:10px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase}
-  #booking .syn{font-size:9px;letter-spacing:.12em;color:#7fd6a0;text-transform:uppercase;display:flex;align-items:center;gap:5px}
-  #booking .syn::before{content:'';width:6px;height:6px;border-radius:50%;background:#7fd6a0;box-shadow:0 0 8px #7fd6a0}
-  #booking .client{font-family:Georgia,serif;font-size:17px;margin:4px 0 1px}
-  #booking .det{font-size:11px;color:var(--ivory-dim);letter-spacing:.03em}
-  .sec-label{font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:3px 0 9px;display:flex;justify-content:space-between}
+  .sec-label{font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:2px 0 9px;display:flex;justify-content:space-between}
   .sec-label .tot{color:var(--ivory-dim)}
   .stops{list-style:none;display:flex;flex-direction:column;position:relative}
   .stop{display:flex;gap:12px;padding:5px 3px;border-radius:8px;transition:.25s}
@@ -64,9 +63,9 @@
   .stop .sub{font-size:10.5px;color:var(--ivory-dim);letter-spacing:.02em;text-align:right;white-space:nowrap}
   .stop .sub b{color:var(--gold)}
 
-  .controls{padding:13px 18px;border-top:1px solid var(--line);background:rgba(10,18,48,.5)}
+  .controls{padding:12px 18px;border-top:1px solid var(--line);background:rgba(10,18,48,.5)}
   button{font-family:'Helvetica Neue',Arial,sans-serif;cursor:pointer;border:none;letter-spacing:.06em;transition:.2s}
-  .play{width:100%;background:linear-gradient(135deg,var(--gold-deep),var(--gold));color:var(--navy);font-weight:600;padding:13px;border-radius:10px;font-size:13px;text-transform:uppercase;letter-spacing:.16em}
+  .play{width:100%;background:linear-gradient(135deg,var(--gold-deep),var(--gold));color:var(--navy);font-weight:600;padding:12px;border-radius:10px;font-size:12.5px;text-transform:uppercase;letter-spacing:.16em}
   .play:hover{filter:brightness(1.06)}
   .rowflex{display:flex;gap:8px;margin-top:10px}
   .btn-ghost{flex:1;background:transparent;border:1px solid var(--line);color:var(--ivory);padding:9px;border-radius:9px;font-size:10px;text-transform:uppercase}
@@ -84,18 +83,17 @@
   @media(max-width:760px){
     html,body{height:auto;overflow-y:auto;overflow-x:hidden}
     #app{flex-direction:column;height:auto;min-height:100vh}
-    #mapwrap{height:40vh;min-height:240px;flex:none}
+    #mapwrap{height:42vh;min-height:250px;flex:none}
     #panel{width:100%;height:auto;border-left:none;border-top:1px solid var(--line);display:flex;flex-direction:column}
-    .brand{order:0;padding:10px 18px 7px}.brand h1{font-size:20px}.brand .kicker{font-size:9px}
-    #live{order:1;padding:9px 18px}
-    .controls{order:2;border-top:none;border-bottom:1px solid var(--line);padding:11px 18px}
+    .tourhead{order:0;padding:10px 16px 9px}.th-title{font-size:20px}
+    #live{order:1;padding:8px 16px}
+    .controls{order:2;border-top:none;border-bottom:1px solid var(--line);padding:10px 16px}
     .play{padding:11px;font-size:12px}
     .opttoggle{display:block;width:100%;background:transparent;border:1px solid var(--line);color:var(--ivory-dim);
       padding:8px;border-radius:9px;font-size:10px;text-transform:uppercase;letter-spacing:.16em;margin-top:9px}
-    .opts{display:none;margin-top:9px}
-    .opts.open{display:block}
-    .rowflex{margin-top:0}.sub-controls{margin-top:9px}.styletog{margin-top:9px}
-    .scroll{order:3;overflow:visible;flex:none;padding-top:8px;padding-bottom:30px}
+    .opts{display:none;margin-top:9px}.opts.open{display:block}
+    .rowflex{margin-top:0}
+    .scroll{order:3;overflow:visible;flex:none;padding-top:9px;padding-bottom:30px}
   }
 </style>
 </head>
@@ -103,26 +101,24 @@
 <div id="app">
   <div id="mapwrap"><svg id="map" viewBox="0 0 1000 720" preserveAspectRatio="xMidYMid slice"></svg><div id="here">—</div></div>
   <aside id="panel">
-    <div class="brand"><div><div class="kicker">Luxe Sailing</div><h1 class="serif">Roam</h1></div><div class="vessel" id="vessel">—</div></div>
+    <div class="tourhead">
+      <div class="th-top"><span class="brandk">Roam <i>·</i> Luxe Sailing</span><span class="syn" id="syn">TMS · synced</span></div>
+      <div class="th-title serif" id="tTitle">—</div>
+      <div class="th-meta" id="tMeta">—</div>
+    </div>
     <div id="live">
-      <div class="r1"><span class="leg" id="lLeg">Ready</span><span class="dist" id="lDist"><b>0</b> / 0 NM</span></div>
-      <div class="name serif" id="lName">—</div>
+      <div class="r1"><span class="name serif" id="lName">—</span><span class="dist" id="lDist">—</span></div>
       <div id="bar"><div id="barfill"></div></div>
     </div>
     <div class="scroll">
-      <div id="booking">
-        <div class="top"><span class="ref" id="bkRef">—</span><span class="syn">TMS · synced</span></div>
-        <div class="client serif" id="bkClient">—</div>
-        <div class="det" id="bkDet">—</div>
-      </div>
       <div class="sec-label"><span>Itinerary</span><span class="tot" id="count">—</span></div>
       <ul class="stops" id="stopList"></ul>
     </div>
     <div class="controls">
-      <button class="play" id="playBtn">&#9654; Play voyage</button>
+      <button class="play" id="playBtn">&#9654; Play</button>
       <button class="opttoggle" id="optToggle">Options &#9662;</button>
       <div class="opts" id="opts">
-        <div class="rowflex"><button class="btn-ghost" id="loadTms">Reload TMS</button><button class="btn-ghost" id="loadSample">Sample route</button></div>
+        <div class="rowflex"><button class="btn-ghost" id="loadTms">Sailing tour</button><button class="btn-ghost" id="loadSample">Land tour</button></div>
         <div class="sub-controls"><span class="lab">Speed</span><input type="range" id="speed" min="0.5" max="2.5" step="0.1" value="0.5"></div>
         <div class="styletog"><button id="s0" class="on">Navy</button><button id="s1">Night</button><button id="s2">Ivory</button></div>
       </div>
@@ -142,26 +138,29 @@ const THEMES=[
   {sea1:'#22386f',sea2:'#0b1430',land:'#d8c8a2',coast:'#9a824f',route:'#c4a875',ivory:'#f4f1ea'},
   {sea1:'#101d40',sea2:'#060c1c',land:'#2f4068',coast:'#5d6f9a',route:'#d8bd84',ivory:'#e9eef7'},
   {sea1:'#e7e0d0',sea2:'#d3c9b3',land:'#b9a677',coast:'#7d6534',route:'#a9852e',ivory:'#2c2a22'}];
-const TMS_BOOKING={booking_ref:"LS-2026-0418",client:{name:"Whitcombe Charter Party",pax:6},
+const ICON={sea:'\u26F5',land:'\uD83D\uDE97',art:'\uD83C\uDFAD'};
+const TMS_BOOKING={mode:'sea',units:'NM',booking_ref:"LS-2026-0418",client:{name:"Whitcombe Charter Party",pax:6},
   start_date:"2026-06-14",end_date:"2026-06-21",vessel:{name:"S/Y Meltemi"},
-  legs:[{code:"TR-001",destination:"Athens",lat:37.9364,lng:23.6470,nights:0,note:"Embarkation"},
-    {code:"TR-002",destination:"Kea",lat:37.6610,lng:24.3330,nights:1,note:"Vourkari Bay"},
-    {code:"TR-003",destination:"Mykonos",lat:37.4467,lng:25.3289,nights:2,note:"Old Port"},
-    {code:"TR-004",destination:"Paros",lat:37.0855,lng:25.1505,nights:1,note:"Naoussa"},
-    {code:"TR-005",destination:"Ios",lat:36.7230,lng:25.2870,nights:1,note:"Manganari"},
-    {code:"TR-006",destination:"Santorini",lat:36.4130,lng:25.4320,nights:2,note:"Caldera"}]};
-const SAMPLE={vessel:{name:"S/Y Meltemi"},legs:[
-  {code:"",destination:'Athens',lat:37.9364,lng:23.6470,nights:0},{code:"",destination:'Hydra',lat:37.3490,lng:23.4670,nights:1},
-  {code:"",destination:'Spetses',lat:37.2630,lng:23.1580,nights:1},{code:"",destination:'Milos',lat:36.7400,lng:24.4180,nights:1},
-  {code:"",destination:'Santorini',lat:36.4130,lng:25.4320,nights:2}]};
+  legs:[{code:"TR-001",destination:"Athens",lat:37.9364,lng:23.6470,nights:0},
+    {code:"TR-002",destination:"Kea",lat:37.6610,lng:24.3330,nights:1},
+    {code:"TR-003",destination:"Mykonos",lat:37.4467,lng:25.3289,nights:2},
+    {code:"TR-004",destination:"Paros",lat:37.0855,lng:25.1505,nights:1},
+    {code:"TR-005",destination:"Ios",lat:36.7230,lng:25.2870,nights:1},
+    {code:"TR-006",destination:"Santorini",lat:36.4130,lng:25.4320,nights:2}]};
+const LAND_TOUR={mode:'land',units:'km',title:"Peloponnese Explorer",vessel:{name:"Private coach"},
+  legs:[{code:"",destination:'Athens',lat:37.9838,lng:23.7275,nights:0},
+    {code:"",destination:'Nafplio',lat:37.5675,lng:22.8000,nights:1},
+    {code:"",destination:'Sparta',lat:37.0739,lng:22.4297,nights:1},
+    {code:"",destination:'Monemvasia',lat:36.6877,lng:23.0530,nights:2}]};
 
-let stops=[],pts=[],legB=[],legNM=[],cumNM=[],totalNM=0,B=null,projP=[],theme=0,banner=true;
+let stops=[],pts=[],legB=[],legD=[],cumD=[],totalD=0,B=null,projP=[],theme=0,U='NM',MODE='sea';
 let phase='idle',animI=0,animCursor=1,raf=null,leadT=null;
 let cam={x:0,y:0,w:W,h:H},camT={x:0,y:0,w:W,h:H};
 const fmtRange=(a,b)=>{const o={day:'numeric',month:'short'};return new Date(a).toLocaleDateString('en-AU',o)+' – '+new Date(b).toLocaleDateString('en-AU',o);};
 const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
-function hav(a,b){const R=3440.065,r=Math.PI/180,dLa=(b.lat-a.lat)*r,dLn=(b.lng-a.lng)*r;
+function havKm(a,b){const R=6371,r=Math.PI/180,dLa=(b.lat-a.lat)*r,dLn=(b.lng-a.lng)*r;
   const s=Math.sin(dLa/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLn/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
+function dist(a,b){const km=havKm(a,b);return U==='NM'?km/1.852:km;}
 function bounds(){const la=stops.map(s=>s.lat),ln=stops.map(s=>s.lng);
   let mLa=Math.min(...la),xLa=Math.max(...la),mLn=Math.min(...ln),xLn=Math.max(...ln);
   let py=(xLa-mLa)*0.55||0.4,px=(xLn-mLn)*0.55||0.4;mLa-=py;xLa+=py;mLn-=px;xLn+=px;
@@ -184,9 +183,9 @@ function draw(){const T=THEMES[theme];for(const k in T)document.documentElement.
   LANDREF.forEach(r=>{const d=r.map(c=>project(c[1],c[0]).join(',')).join(' ');
     svg.appendChild(el('polygon',{points:d,fill:T.land,stroke:T.coast,'stroke-width':1,'stroke-linejoin':'round'}));});
   REGIONS.forEach(g=>{const p=project(g.lat,g.lng),t=el('text',{x:p[0],y:p[1],'text-anchor':'middle'});t.setAttribute('class',g.c);t.textContent=g.t;svg.appendChild(t);});
-  pts=[];legB=[0];legNM=[];cumNM=[0];totalNM=0;
+  pts=[];legB=[0];legD=[];cumD=[0];totalD=0;
   for(let i=0;i<projP.length-1;i++){const seg=curve(projP[i],projP[i+1],64);pts=pts.concat(i?seg.slice(1):seg);legB.push(pts.length-1);
-    const d=hav(stops[i],stops[i+1]);legNM.push(d);totalNM+=d;cumNM.push(totalNM);}
+    const d=dist(stops[i],stops[i+1]);legD.push(d);totalD+=d;cumD.push(totalD);}
   svg.appendChild(el('polyline',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',stroke:T.route,'stroke-opacity':.22,'stroke-width':1.8,'stroke-dasharray':'1 7','stroke-linecap':'round'}));
   trailGlow=el('polyline',{points:'',fill:'none',stroke:T.route,'stroke-width':7,'stroke-opacity':.3,'stroke-linecap':'round','stroke-linejoin':'round',filter:'url(#glow)'});
   trailEl=el('polyline',{points:'',fill:'none',stroke:T.route,'stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'});
@@ -194,68 +193,67 @@ function draw(){const T=THEMES[theme];for(const k in T)document.documentElement.
   projP.forEach((p,i)=>{svg.appendChild(el('circle',{cx:p[0],cy:p[1],r:5,fill:T.route,stroke:T.ivory,'stroke-width':1.4}));
     const up=i%2===0,t=el('text',{x:p[0],y:p[1]+(up?-13:24),'text-anchor':'middle'});t.setAttribute('class','lbl');t.textContent=stops[i].destination;svg.appendChild(t);});
   boatEl=el('text',{x:projP[0][0],y:projP[0][1],'text-anchor':'middle','dominant-baseline':'central','font-size':22});
-  boatEl.textContent='\u26F5';boatEl.style.filter='drop-shadow(0 1px 4px rgba(0,0,0,.7))';svg.appendChild(boatEl);
-}
+  boatEl.textContent=ICON[MODE]||ICON.sea;boatEl.style.filter='drop-shadow(0 1px 4px rgba(0,0,0,.7))';svg.appendChild(boatEl);}
 function setCam(cx,cy,z){const w=W/z,h=H/z;camT={w,h,x:Math.max(0,Math.min(W-w,cx-w/2)),y:Math.max(0,Math.min(H-h,cy-h/2))};}
 function camLoop(){cam.x+=(camT.x-cam.x)*.06;cam.y+=(camT.y-cam.y)*.06;cam.w+=(camT.w-cam.w)*.06;cam.h+=(camT.h-cam.h)*.06;
   svg.setAttribute('viewBox',`${cam.x} ${cam.y} ${cam.w} ${cam.h}`);requestAnimationFrame(camLoop);}
+const r0=n=>Math.round(n);
 function renderPanel(){const l=$('stopList');l.innerHTML='';
   stops.forEach((s,i)=>{const li=document.createElement('li');li.className='stop';li.id='st'+i;
-    const dist=i>0?`<b>${Math.round(legNM[i-1])} NM</b> · `:'';
+    const d=i>0?`<b>${r0(legD[i-1])} ${U}</b> · `:'';
     const nights=s.nights?`${s.nights} night${s.nights>1?'s':''}`:'departure';
     li.innerHTML=`<div class="rail"><div class="num">${i+1}</div><div class="conn"></div></div>
-      <div class="body"><span class="nm">${s.destination}</span><span class="sub">${dist}${nights}${s.code?'<br>'+s.code:''}</span></div>`;
+      <div class="body"><span class="nm">${s.destination}</span><span class="sub">${d}${nights}</span></div>`;
     l.appendChild(li);});
-  $('count').textContent=Math.round(totalNM)+' NM';}
+  $('count').textContent=r0(totalD)+' '+U;}
 
-function loadBooking(b,withBanner){banner=withBanner;stops=b.legs.map(x=>({...x}));
-  $('vessel').innerHTML=(b.vessel?b.vessel.name:'')+(b.client?'<br>'+b.client.pax+' guests':'');
-  draw();renderPanel();resetIdle();
-  $('booking').style.display=withBanner?'block':'none';
-  if(withBanner){$('bkRef').textContent=b.booking_ref;$('bkClient').textContent=b.client.name;
-    $('bkDet').textContent=fmtRange(b.start_date,b.end_date)+' · '+b.client.pax+' guests';}
-  $('lLeg').textContent='Ready';$('lName').textContent=stops[0].destination+' → '+stops[stops.length-1].destination;
-  $('lDist').innerHTML=`<b>0</b> / ${Math.round(totalNM)} NM`;$('barfill').style.width='0%';
+function loadBooking(b){MODE=b.mode||'sea';U=b.units||(MODE==='sea'?'NM':'km');stops=b.legs.map(x=>({...x}));
+  resetIdle();draw();renderPanel();
+  // header
+  const isTMS=!!b.booking_ref;
+  $('syn').classList.toggle('hide',!isTMS);
+  $('tTitle').textContent=isTMS?b.client.name:(b.title||'Itinerary');
+  const meta=[];if(isTMS)meta.push(b.booking_ref);if(b.vessel)meta.push(b.vessel.name);
+  if(isTMS)meta.push(fmtRange(b.start_date,b.end_date),b.client.pax+' guests');else meta.push(stops.length+' stops');
+  $('tMeta').textContent=meta.join('  ·  ');
+  // status idle
+  $('lName').textContent=stops[0].destination+' \u2192 '+stops[stops.length-1].destination;
+  $('lDist').innerHTML=`${r0(totalD)} ${U}`;$('barfill').style.width='0%';
   setCam(W/2,H/2,1.0);}
 
-function setBtn(){const m={idle:'&#9654; Play voyage',playing:'&#10073;&#10073; Pause',paused:'&#9654; Resume',done:'&#9654; Replay voyage'};$('playBtn').innerHTML=m[phase];}
+function setBtn(){const m={idle:'&#9654; Play',playing:'&#10073;&#10073; Pause',paused:'&#9654; Resume',done:'&#9654; Replay'};$('playBtn').innerHTML=m[phase];}
 function resetIdle(){phase='idle';cancelAnimationFrame(raf);clearTimeout(leadT);setBtn();$('here').classList.remove('show');}
-
 function onPlay(){
-  if(phase==='playing'){phase='paused';cancelAnimationFrame(raf);clearTimeout(leadT);setBtn();$('lLeg').textContent='Paused';return;}
-  if(phase==='paused'){phase='playing';setBtn();$('lLeg').textContent='En route';raf=requestAnimationFrame(loop);return;}
-  // fresh start / replay
+  if(phase==='playing'){phase='paused';cancelAnimationFrame(raf);clearTimeout(leadT);setBtn();return;}
+  if(phase==='paused'){phase='playing';setBtn();raf=requestAnimationFrame(loop);return;}
   draw();renderPanel();document.querySelectorAll('.stop').forEach(s=>s.classList.remove('active','done'));
   animI=0;animCursor=1;phase='playing';setBtn();$('here').classList.add('show');$('st0').classList.add('done');
   setCam(projP[0][0],projP[0][1],FZOOM);
-  leadT=setTimeout(()=>{if(phase==='playing')raf=requestAnimationFrame(loop);},350);
-}
+  leadT=setTimeout(()=>{if(phase==='playing')raf=requestAnimationFrame(loop);},350);}
 function paint(){const seg=pts.slice(0,animI+1).map(p=>p.join(',')).join(' ');trailEl.setAttribute('points',seg);trailGlow.setAttribute('points',seg);
   const c=pts[animI];boatEl.setAttribute('x',c[0]);boatEl.setAttribute('y',c[1]);setCam(c[0],c[1],FZOOM);
-  const f=animI/(pts.length-1);$('barfill').style.width=(f*100)+'%';$('lDist').innerHTML=`<b>${(totalNM*f).toFixed(0)}</b> / ${Math.round(totalNM)} NM`;}
+  const f=animI/(pts.length-1);$('barfill').style.width=(f*100)+'%';$('lDist').innerHTML=`<b>${r0(totalD*f)}</b> / ${r0(totalD)} ${U}`;}
 function loop(){if(phase!=='playing')return;
   const adv=Math.max(1,Math.round(parseFloat($('speed').value)*2));animI=Math.min(animI+adv,pts.length-1);paint();
-  if(animCursor<stops.length){$('lLeg').textContent='En route';$('lName').textContent='→ '+stops[animCursor].destination;
-    $('here').textContent='Underway · '+stops[animCursor-1].destination+' → '+stops[animCursor].destination;
+  if(animCursor<stops.length){$('lName').textContent='\u2192 '+stops[animCursor].destination;
+    $('here').textContent=stops[animCursor-1].destination+' \u2192 '+stops[animCursor].destination;
     document.querySelectorAll('.stop').forEach(s=>s.classList.remove('active'));$('st'+animCursor)?.classList.add('active');}
   if(animCursor<stops.length&&animI>=legB[animCursor]){$('st'+animCursor)?.classList.add('done');$('here').textContent='Arrived · '+stops[animCursor].destination;animCursor++;}
-  if(animI>=pts.length-1){phase='done';setBtn();$('lLeg').textContent='Complete';$('lName').textContent=stops[stops.length-1].destination;
-    $('barfill').style.width='100%';$('lDist').innerHTML=`<b>${Math.round(totalNM)}</b> / ${Math.round(totalNM)} NM`;$('here').textContent='Voyage complete';setCam(W/2,H/2,1.0);return;}
+  if(animI>=pts.length-1){phase='done';setBtn();$('lName').textContent=stops[stops.length-1].destination;
+    $('barfill').style.width='100%';$('lDist').innerHTML=`<b>${r0(totalD)}</b> / ${r0(totalD)} ${U}`;$('here').textContent='Arrived · '+stops[stops.length-1].destination;setCam(W/2,H/2,1.0);return;}
   raf=requestAnimationFrame(loop);}
-
 function repaintProgress(){for(let k=0;k<stops.length;k++){const e=$('st'+k);if(!e)continue;e.classList.remove('active','done');if(k<animCursor)e.classList.add('done');}
-  if((phase==='playing'||phase==='paused')&&animCursor<stops.length)$('st'+animCursor)?.classList.add('active');
-  if(phase!=='idle')paint();}
+  if((phase==='playing'||phase==='paused')&&animCursor<stops.length)$('st'+animCursor)?.classList.add('active');if(phase!=='idle')paint();}
 
 $('playBtn').onclick=onPlay;
-$('loadTms').onclick=()=>{resetIdle();loadBooking(TMS_BOOKING,true);};
-$('loadSample').onclick=()=>{resetIdle();loadBooking(SAMPLE,false);};
+$('loadTms').onclick=()=>{loadBooking(TMS_BOOKING);};
+$('loadSample').onclick=()=>{loadBooking(LAND_TOUR);};
 function setTheme(n,b){theme=n;document.querySelectorAll('.styletog button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   draw();renderPanel();if(phase==='idle')$('barfill').style.width='0%';else repaintProgress();}
 $('s0').onclick=e=>setTheme(0,e.target);$('s1').onclick=e=>setTheme(1,e.target);$('s2').onclick=e=>setTheme(2,e.target);
 $('optToggle').onclick=()=>{const o=$('opts');o.classList.toggle('open');$('optToggle').innerHTML=o.classList.contains('open')?'Options &#9652;':'Options &#9662;';};
 
-loadBooking(TMS_BOOKING,true);camLoop();
+loadBooking(TMS_BOOKING);camLoop();
 </script>
 </body>
 </html>
