@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Voyage</title>
+<title>Roam · Luxe Sailing</title>
 <style>
   :root{
     --navy:#15244e; --navy2:#0d1838; --ink:#0a1230; --gold:#c4a875; --gold-deep:#a98a52;
@@ -78,14 +78,24 @@
   .styletog{display:flex;gap:6px;margin-top:9px}
   .styletog button{flex:1;background:transparent;border:1px solid var(--line);color:var(--ivory-dim);padding:7px;border-radius:8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
   .styletog button.on{border-color:var(--gold);color:var(--gold);background:rgba(196,168,117,.1)}
+  .opttoggle{display:none}
+  .opts{display:block}
 
   @media(max-width:760px){
     html,body{height:auto;overflow-y:auto;overflow-x:hidden}
     #app{flex-direction:column;height:auto;min-height:100vh}
     #mapwrap{height:40vh;min-height:240px;flex:none}
     #panel{width:100%;height:auto;border-left:none;border-top:1px solid var(--line);display:flex;flex-direction:column}
-    .brand{order:0}#live{order:1}.controls{order:2;border-top:none;border-bottom:1px solid var(--line)}
-    .scroll{order:3;overflow:visible;flex:none;padding-top:6px;padding-bottom:30px}
+    .brand{order:0;padding:10px 18px 7px}.brand h1{font-size:20px}.brand .kicker{font-size:9px}
+    #live{order:1;padding:9px 18px}
+    .controls{order:2;border-top:none;border-bottom:1px solid var(--line);padding:11px 18px}
+    .play{padding:11px;font-size:12px}
+    .opttoggle{display:block;width:100%;background:transparent;border:1px solid var(--line);color:var(--ivory-dim);
+      padding:8px;border-radius:9px;font-size:10px;text-transform:uppercase;letter-spacing:.16em;margin-top:9px}
+    .opts{display:none;margin-top:9px}
+    .opts.open{display:block}
+    .rowflex{margin-top:0}.sub-controls{margin-top:9px}.styletog{margin-top:9px}
+    .scroll{order:3;overflow:visible;flex:none;padding-top:8px;padding-bottom:30px}
   }
 </style>
 </head>
@@ -93,7 +103,7 @@
 <div id="app">
   <div id="mapwrap"><svg id="map" viewBox="0 0 1000 720" preserveAspectRatio="xMidYMid slice"></svg><div id="here">—</div></div>
   <aside id="panel">
-    <div class="brand"><div><div class="kicker">Luxe Sailing</div><h1 class="serif">Voyage</h1></div><div class="vessel" id="vessel">—</div></div>
+    <div class="brand"><div><div class="kicker">Luxe Sailing</div><h1 class="serif">Roam</h1></div><div class="vessel" id="vessel">—</div></div>
     <div id="live">
       <div class="r1"><span class="leg" id="lLeg">Ready</span><span class="dist" id="lDist"><b>0</b> / 0 NM</span></div>
       <div class="name serif" id="lName">—</div>
@@ -110,9 +120,12 @@
     </div>
     <div class="controls">
       <button class="play" id="playBtn">&#9654; Play voyage</button>
-      <div class="rowflex"><button class="btn-ghost" id="loadTms">Reload TMS</button><button class="btn-ghost" id="loadSample">Sample route</button></div>
-      <div class="sub-controls"><span class="lab">Speed</span><input type="range" id="speed" min="0.5" max="2.5" step="0.1" value="0.5"></div>
-      <div class="styletog"><button id="s0" class="on">Navy</button><button id="s1">Night</button><button id="s2">Ivory</button></div>
+      <button class="opttoggle" id="optToggle">Options &#9662;</button>
+      <div class="opts" id="opts">
+        <div class="rowflex"><button class="btn-ghost" id="loadTms">Reload TMS</button><button class="btn-ghost" id="loadSample">Sample route</button></div>
+        <div class="sub-controls"><span class="lab">Speed</span><input type="range" id="speed" min="0.5" max="2.5" step="0.1" value="0.5"></div>
+        <div class="styletog"><button id="s0" class="on">Navy</button><button id="s1">Night</button><button id="s2">Ivory</button></div>
+      </div>
     </div>
   </aside>
 </div>
@@ -240,6 +253,7 @@ $('loadSample').onclick=()=>{resetIdle();loadBooking(SAMPLE,false);};
 function setTheme(n,b){theme=n;document.querySelectorAll('.styletog button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   draw();renderPanel();if(phase==='idle')$('barfill').style.width='0%';else repaintProgress();}
 $('s0').onclick=e=>setTheme(0,e.target);$('s1').onclick=e=>setTheme(1,e.target);$('s2').onclick=e=>setTheme(2,e.target);
+$('optToggle').onclick=()=>{const o=$('opts');o.classList.toggle('open');$('optToggle').innerHTML=o.classList.contains('open')?'Options &#9652;':'Options &#9662;';};
 
 loadBooking(TMS_BOOKING,true);camLoop();
 </script>
