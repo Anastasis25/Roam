@@ -39,7 +39,7 @@
 
   /* slim status strip */
   #live{padding:9px 20px;border-bottom:1px solid var(--line);background:rgba(196,168,117,.05)}
-  #live .r1{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  #live .r1{display:flex;align-items:center;gap:9px}
   #live .name{font-family:Georgia,serif;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #live .dist{font-family:Georgia,serif;font-size:14px;color:var(--ivory);white-space:nowrap}
   #live .dist b{color:var(--gold);font-weight:600}
@@ -77,26 +77,25 @@
   .styletog{display:flex;gap:6px;margin-top:9px}
   .styletog button{flex:1;background:transparent;border:1px solid var(--line);color:var(--ivory-dim);padding:7px;border-radius:8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
   .styletog button.on{border-color:var(--gold);color:var(--gold);background:rgba(196,168,117,.1)}
-  .opttoggle{display:none}
-  .opts{display:block}
-  .ctop{display:flex;gap:8px;align-items:stretch}
-  .play{flex:1}
   .syn{display:none}
+  .miniplay{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold-deep),var(--gold));
+    color:var(--navy);font-size:11px;display:grid;place-items:center;line-height:1}
+  .miniplay:hover{filter:brightness(1.07)}
+  .miniopt{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:transparent;border:1px solid var(--line);
+    color:var(--ivory-dim);font-size:13px;display:grid;place-items:center}
+  .miniopt:hover,.miniopt.on{border-color:var(--gold);color:var(--gold)}
+  #live .name{flex:1}
+  .opts{display:none;margin-top:11px}
+  .opts.open{display:block}
 
   @media(max-width:760px){
     html,body{height:auto;overflow-y:auto;overflow-x:hidden}
     #app{flex-direction:column;height:auto;min-height:100vh}
     #mapwrap{height:50vh;min-height:280px;flex:none}
     #panel{width:100%;height:auto;border-left:none;border-top:1px solid var(--line);display:flex;flex-direction:column}
-    .tourhead{order:0;padding:10px 16px 9px}.th-title{font-size:20px}
-    #live{order:1;padding:8px 16px}
-    .controls{order:2;border-top:none;border-bottom:1px solid var(--line);padding:9px 16px}
-    .play{padding:10px;font-size:11.5px}
-    .opttoggle{display:block;flex:0 0 auto;background:transparent;border:1px solid var(--line);color:var(--ivory-dim);
-      padding:10px 13px;border-radius:9px;font-size:9.5px;text-transform:uppercase;letter-spacing:.14em}
-    .opts{display:none;margin-top:9px}.opts.open{display:block}
-    .rowflex{margin-top:0}
-    .scroll{order:3;overflow:visible;flex:none;padding-top:9px;padding-bottom:30px}
+    .tourhead{padding:10px 16px 9px}.th-title{font-size:20px}
+    #live{padding:9px 16px}
+    .scroll{overflow:visible;flex:none;padding-top:9px;padding-bottom:30px}
   }
 </style>
 </head>
@@ -110,20 +109,22 @@
       <div class="th-meta" id="tMeta">—</div>
     </div>
     <div id="live">
-      <div class="r1"><span class="name serif" id="lName">—</span><span class="dist" id="lDist">—</span></div>
+      <div class="r1">
+        <button class="miniplay" id="playBtn" title="Play">&#9654;</button>
+        <span class="name serif" id="lName">—</span>
+        <span class="dist" id="lDist">—</span>
+        <button class="miniopt" id="optToggle" title="Options">&#9881;</button>
+      </div>
       <div id="bar"><div id="barfill"></div></div>
-    </div>
-    <div class="scroll">
-      <div class="sec-label"><span>Itinerary</span><span class="tot" id="count">—</span></div>
-      <ul class="stops" id="stopList"></ul>
-    </div>
-    <div class="controls">
-      <div class="ctop"><button class="play" id="playBtn">&#9654; Play</button><button class="opttoggle" id="optToggle">Options</button></div>
       <div class="opts" id="opts">
         <div class="rowflex"><button class="btn-ghost" id="loadTms">Sailing tour</button><button class="btn-ghost" id="loadSample">Land tour</button></div>
         <div class="sub-controls"><span class="lab">Speed</span><input type="range" id="speed" min="0.5" max="2.5" step="0.1" value="0.5"></div>
         <div class="styletog"><button id="s0" class="on">Navy</button><button id="s1">Night</button><button id="s2">Ivory</button></div>
       </div>
+    </div>
+    <div class="scroll">
+      <div class="sec-label"><span>Itinerary</span><span class="tot" id="count">—</span></div>
+      <ul class="stops" id="stopList"></ul>
     </div>
   </aside>
 </div>
@@ -223,7 +224,7 @@ function loadBooking(b){MODE=b.mode||'sea';U=b.units||(MODE==='sea'?'NM':'km');s
   $('lDist').innerHTML=`${r0(totalD)} ${U}`;$('barfill').style.width='0%';
   setCam(W/2,H/2,1.0);}
 
-function setBtn(){const m={idle:'&#9654; Play',playing:'&#10073;&#10073; Pause',paused:'&#9654; Resume',done:'&#9654; Replay'};$('playBtn').innerHTML=m[phase];}
+function setBtn(){const g={idle:'&#9654;',playing:'&#10073;&#10073;',paused:'&#9654;',done:'&#8635;'},t={idle:'Play',playing:'Pause',paused:'Resume',done:'Replay'};$('playBtn').innerHTML=g[phase];$('playBtn').title=t[phase];}
 function resetIdle(){phase='idle';cancelAnimationFrame(raf);clearTimeout(leadT);setBtn();$('here').classList.remove('show');}
 function onPlay(){
   if(phase==='playing'){phase='paused';cancelAnimationFrame(raf);clearTimeout(leadT);setBtn();return;}
@@ -253,7 +254,7 @@ $('loadSample').onclick=()=>{loadBooking(LAND_TOUR);};
 function setTheme(n,b){theme=n;document.querySelectorAll('.styletog button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   draw();renderPanel();if(phase==='idle')$('barfill').style.width='0%';else repaintProgress();}
 $('s0').onclick=e=>setTheme(0,e.target);$('s1').onclick=e=>setTheme(1,e.target);$('s2').onclick=e=>setTheme(2,e.target);
-$('optToggle').onclick=()=>{const o=$('opts');o.classList.toggle('open');$('optToggle').innerHTML=o.classList.contains('open')?'Options &#9652;':'Options &#9662;';};
+$('optToggle').onclick=()=>{const o=$('opts');o.classList.toggle('open');$('optToggle').classList.toggle('on',o.classList.contains('open'));};
 
 loadBooking(TMS_BOOKING);camLoop();
 </script>
