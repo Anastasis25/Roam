@@ -23,6 +23,26 @@
   #here{position:absolute;left:13px;bottom:13px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--ivory-dim);background:rgba(10,18,48,.62);padding:6px 11px;border:1px solid var(--line);border-radius:8px;opacity:0;transition:.4s;max-width:72%}
   #here.show{opacity:1}
+  #sky{display:none;position:absolute;inset:0;z-index:0;background:radial-gradient(85% 60% at 50% 26%,#4a82bd 0%,#23477099 38%,#0a1730 72%)}
+  #sun{display:none;position:absolute;left:50%;top:12%;transform:translateX(-50%);width:130px;height:130px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,228,168,.95),rgba(255,201,120,.25) 58%,transparent 70%);z-index:0;filter:blur(1px)}
+  #stage{position:absolute;inset:0;z-index:1}
+  #mapwrap.d3{perspective:900px}
+  #mapwrap.d3 #sky,#mapwrap.d3 #sun{display:block}
+  #mapwrap.d3 #stage{transform-origin:50% 56%;animation:orbit 22s ease-in-out infinite}
+  #mapwrap.d3 #map .region,#mapwrap.d3 #map .sea{display:none}
+  #mapwrap.d3 #map .boat{font-size:34px}
+  #mapwrap.d3 #map .preview{animation:flow 1.1s linear infinite;stroke-opacity:.5}
+  .pin3d{display:none}
+  #mapwrap.d3 .pin3d{display:inline}
+  .vshadow{display:none}
+  #mapwrap.d3 .vshadow{display:inline}
+  @keyframes orbit{0%{transform:rotateX(56deg) rotateZ(-6deg) scale(1.34)}50%{transform:rotateX(50deg) rotateZ(6deg) scale(1.34)}100%{transform:rotateX(56deg) rotateZ(-6deg) scale(1.34)}}
+  @keyframes flow{to{stroke-dashoffset:-8}}
+  #viewtog{position:absolute;top:12px;left:12px;z-index:5;display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(10,18,48,.6);backdrop-filter:blur(8px)}
+  #viewtog button{background:transparent;color:var(--ivory-dim);padding:6px 13px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;border:none;cursor:pointer}
+  #viewtog button.on{background:var(--gold);color:var(--navy)}
+  #here{z-index:4}
 
   #panel{width:330px;background:linear-gradient(180deg,var(--navy),var(--navy2));border-left:1px solid var(--line);display:flex;flex-direction:column;height:100vh}
 
@@ -101,7 +121,7 @@
 </head>
 <body>
 <div id="app">
-  <div id="mapwrap"><svg id="map" viewBox="0 0 1000 720" preserveAspectRatio="xMidYMid slice"></svg><div id="here">—</div></div>
+  <div id="mapwrap"><div id="sky"></div><div id="sun"></div><div id="stage"><svg id="map" viewBox="0 0 1000 720" preserveAspectRatio="xMidYMid slice"></svg></div><div id="viewtog"><button id="v2d" class="on">2D</button><button id="v3d">3D</button></div><div id="here">—</div></div>
   <aside id="panel">
     <div class="tourhead">
       <div class="th-top"><span class="brandk">Roam <i>·</i> Luxe Sailing</span><span class="syn" id="syn">TMS · synced</span></div>
@@ -152,7 +172,7 @@ const TMS_BOOKING={mode:'sea',units:'NM',booking_ref:"LS-2026-0418",client:{name
     {code:"TR-006",destination:"Santorini",lat:36.4130,lng:25.4320,nights:2}]};
 const LAND_TOUR={mode:'land',units:'km',title:"Peloponnese Explorer",vessel:{name:"Private coach"},
   legs:[{code:"",destination:'Athens',lat:37.9838,lng:23.7275,nights:0},
-    {code:"",destination:'Nafplio',lat:37.5675,lng:22.8000,nights:1},
+    {code:"",destination:'Nafplio',lat:37.5675,lng:22.8000,nights:1,path:[[38.00,23.34],[37.94,22.93]]},
     {code:"",destination:'Sparta',lat:37.0739,lng:22.4297,nights:1},
     {code:"",destination:'Monemvasia',lat:36.6877,lng:23.0530,nights:2}]};
 
@@ -174,7 +194,7 @@ const project=(lat,lng)=>[PAD+(lng-B.minLng)/(B.maxLng-B.minLng)*(W-2*PAD),PAD+(
 function curve(a,p,n){const mx=(a[0]+p[0])/2,my=(a[1]+p[1])/2,dx=p[0]-a[0],dy=p[1]-a[1],cx=mx+dy*0.15,cy=my-dx*0.15,o=[];
   for(let t=0;t<=n;t++){const u=t/n,k=1-u;o.push([k*k*a[0]+2*k*u*cx+u*u*p[0],k*k*a[1]+2*k*u*cy+u*u*p[1]]);}return o;}
 const LANDREF=(typeof LAND!=='undefined')?LAND:[];
-let trailGlow,trailEl,boatEl;
+let trailGlow,trailEl,boatEl,shadowEl;
 function draw(){const T=THEMES[theme];for(const k in T)document.documentElement.style.setProperty('--'+k,T[k]);
   B=bounds();projP=stops.map(s=>project(s.lat,s.lng));svg.innerHTML='';
   const defs=el('defs',{});
@@ -187,15 +207,25 @@ function draw(){const T=THEMES[theme];for(const k in T)document.documentElement.
     svg.appendChild(el('polygon',{points:d,fill:T.land,stroke:T.coast,'stroke-width':1,'stroke-linejoin':'round'}));});
   REGIONS.forEach(g=>{const p=project(g.lat,g.lng),t=el('text',{x:p[0],y:p[1],'text-anchor':'middle'});t.setAttribute('class',g.c);t.textContent=g.t;svg.appendChild(t);});
   pts=[];legB=[0];legD=[];cumD=[0];totalD=0;
-  for(let i=0;i<projP.length-1;i++){const seg=curve(projP[i],projP[i+1],64);pts=pts.concat(i?seg.slice(1):seg);legB.push(pts.length-1);
-    const d=dist(stops[i],stops[i+1]);legD.push(d);totalD+=d;cumD.push(totalD);}
-  svg.appendChild(el('polyline',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',stroke:T.route,'stroke-opacity':.22,'stroke-width':1.8,'stroke-dasharray':'1 7','stroke-linecap':'round'}));
+  for(let i=0;i<projP.length-1;i++){
+    const path=stops[i+1].path;let seg,d;
+    if(path&&path.length){
+      const geo=[[stops[i].lat,stops[i].lng],...path,[stops[i+1].lat,stops[i+1].lng]];
+      seg=geo.map(g=>project(g[0],g[1]));d=0;
+      for(let k=1;k<geo.length;k++)d+=dist({lat:geo[k-1][0],lng:geo[k-1][1]},{lat:geo[k][0],lng:geo[k][1]});
+    }else{seg=curve(projP[i],projP[i+1],64);d=dist(stops[i],stops[i+1]);}
+    pts=pts.concat(i?seg.slice(1):seg);legB.push(pts.length-1);legD.push(d);totalD+=d;cumD.push(totalD);}
+  svg.appendChild(el('polyline',{'class':'preview',points:pts.map(p=>p.join(',')).join(' '),fill:'none',stroke:T.route,'stroke-opacity':.22,'stroke-width':1.8,'stroke-dasharray':'1 7','stroke-linecap':'round'}));
   trailGlow=el('polyline',{points:'',fill:'none',stroke:T.route,'stroke-width':7,'stroke-opacity':.3,'stroke-linecap':'round','stroke-linejoin':'round',filter:'url(#glow)'});
   trailEl=el('polyline',{points:'',fill:'none',stroke:T.route,'stroke-width':2.6,'stroke-linecap':'round','stroke-linejoin':'round'});
   svg.appendChild(trailGlow);svg.appendChild(trailEl);
-  projP.forEach((p,i)=>{svg.appendChild(el('circle',{cx:p[0],cy:p[1],r:5,fill:T.route,stroke:T.ivory,'stroke-width':1.4}));
+  projP.forEach((p,i)=>{
+    svg.appendChild(el('line',{x1:p[0],y1:p[1],x2:p[0],y2:p[1]-28,stroke:T.route,'stroke-width':2,'class':'pin3d'}));
+    svg.appendChild(el('circle',{cx:p[0],cy:p[1]-28,r:4.5,fill:T.route,stroke:T.ivory,'stroke-width':1.2,'class':'pin3d'}));
+    svg.appendChild(el('circle',{cx:p[0],cy:p[1],r:5,fill:T.route,stroke:T.ivory,'stroke-width':1.4}));
     const up=i%2===0,t=el('text',{x:p[0],y:p[1]+(up?-13:24),'text-anchor':'middle'});t.setAttribute('class','lbl');t.textContent=stops[i].destination;svg.appendChild(t);});
-  boatEl=el('text',{x:projP[0][0],y:projP[0][1],'text-anchor':'middle','dominant-baseline':'central','font-size':22});
+  shadowEl=el('ellipse',{cx:projP[0][0],cy:projP[0][1]+11,rx:11,ry:3.4,fill:'rgba(0,0,0,.42)','class':'vshadow'});svg.appendChild(shadowEl);
+  boatEl=el('text',{'class':'boat',x:projP[0][0],y:projP[0][1],'text-anchor':'middle','dominant-baseline':'central','font-size':22});
   boatEl.textContent=ICON[MODE]||ICON.sea;boatEl.style.filter='drop-shadow(0 1px 4px rgba(0,0,0,.7))';svg.appendChild(boatEl);}
 function setCam(cx,cy,z){const w=W/z,h=H/z;camT={w,h,x:Math.max(0,Math.min(W-w,cx-w/2)),y:Math.max(0,Math.min(H-h,cy-h/2))};}
 function camLoop(){cam.x+=(camT.x-cam.x)*.06;cam.y+=(camT.y-cam.y)*.06;cam.w+=(camT.w-cam.w)*.06;cam.h+=(camT.h-cam.h)*.06;
@@ -234,7 +264,7 @@ function onPlay(){
   setCam(projP[0][0],projP[0][1],FZOOM);
   leadT=setTimeout(()=>{if(phase==='playing')raf=requestAnimationFrame(loop);},350);}
 function paint(){const seg=pts.slice(0,animI+1).map(p=>p.join(',')).join(' ');trailEl.setAttribute('points',seg);trailGlow.setAttribute('points',seg);
-  const c=pts[animI];boatEl.setAttribute('x',c[0]);boatEl.setAttribute('y',c[1]);setCam(c[0],c[1],FZOOM);
+  const c=pts[animI];boatEl.setAttribute('x',c[0]);boatEl.setAttribute('y',c[1]);if(shadowEl){shadowEl.setAttribute('cx',c[0]);shadowEl.setAttribute('cy',c[1]+11);}setCam(c[0],c[1],FZOOM);
   const f=animI/(pts.length-1);$('barfill').style.width=(f*100)+'%';$('lDist').innerHTML=`<b>${r0(totalD*f)}</b> / ${r0(totalD)} ${U}`;}
 function loop(){if(phase!=='playing')return;
   const adv=Math.max(1,Math.round(parseFloat($('speed').value)*2));animI=Math.min(animI+adv,pts.length-1);paint();
@@ -255,6 +285,8 @@ function setTheme(n,b){theme=n;document.querySelectorAll('.styletog button').for
   draw();renderPanel();if(phase==='idle')$('barfill').style.width='0%';else repaintProgress();}
 $('s0').onclick=e=>setTheme(0,e.target);$('s1').onclick=e=>setTheme(1,e.target);$('s2').onclick=e=>setTheme(2,e.target);
 $('optToggle').onclick=()=>{const o=$('opts');o.classList.toggle('open');$('optToggle').classList.toggle('on',o.classList.contains('open'));};
+$('v2d').onclick=()=>{document.getElementById('mapwrap').classList.remove('d3');$('v2d').classList.add('on');$('v3d').classList.remove('on');};
+$('v3d').onclick=()=>{document.getElementById('mapwrap').classList.add('d3');$('v3d').classList.add('on');$('v2d').classList.remove('on');};
 
 loadBooking(TMS_BOOKING);camLoop();
 </script>
